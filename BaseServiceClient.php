@@ -10,6 +10,8 @@ abstract class BaseServiceClient {
 	private $ops_service_url;
 	private $ops_table;
 	# ----------------------------------------------
+	private $ops_lang = null;
+	# ----------------------------------------------
 	public function __construct($ps_base_url,$ps_service){
 		$this->ops_service_url = $ps_base_url."/service.php/".$ps_service;
 
@@ -56,6 +58,15 @@ abstract class BaseServiceClient {
 	# ----------------------------------------------
 	public function getGetParameter($ps_param_name){
 		return $this->opa_get_parameters[$ps_param_name];
+	}
+	# ----------------------------------------------
+	public function setLang($ps_lang) {
+		$this->ops_lang = $ps_lang;
+		$this->addGetParameter("lang",$ps_lang);
+	}
+	# ----------------------------------------------
+	public function getLang() {
+		return $this->ops_lang;
 	}
 	# ----------------------------------------------
 	public function request(){
