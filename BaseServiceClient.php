@@ -65,7 +65,7 @@ abstract class BaseServiceClient {
 
 		$va_get = array();
 		foreach($this->getAllGetParameters() as $vs_name => $vs_val){
-			$va_get[] = $vs_name."=".$vs_val;
+			$va_get[] = $vs_name."=".urlencode($vs_val);
 		}
 
 		$vs_get = sizeof($va_get)>0 ? "?".join("&",$va_get) : "";
@@ -82,7 +82,7 @@ abstract class BaseServiceClient {
 
 		$vs_exec = curl_exec($vo_handle);
 		curl_close($vo_handle);
-		
+
 		return new ServiceResult($vs_exec);
 	}
 	# ----------------------------------------------
