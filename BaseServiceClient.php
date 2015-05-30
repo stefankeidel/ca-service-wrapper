@@ -12,7 +12,7 @@ abstract class BaseServiceClient {
 	# ----------------------------------------------
 	private $ops_lang = null;
 	# ----------------------------------------------
-	public function __construct($ps_base_url,$ps_service){
+	public function __construct($ps_base_url, $ps_service) {
 		$this->ops_service_url = $ps_base_url."/service.php/".$ps_service;
 
 		$this->opa_get_parameters = array();
@@ -21,42 +21,42 @@ abstract class BaseServiceClient {
 		$this->ops_table = "";
 	}
 	# ----------------------------------------------
-	public function setRequestMethod($ps_method){
-		if(!in_array($ps_method,array("GET","PUT","DELETE","OPTIONS"))){
+	public function setRequestMethod($ps_method) {
+		if(!in_array($ps_method,array("GET","PUT","DELETE","OPTIONS","POST"))) {
 			return false;
 		}
 		$this->ops_request_method = $ps_method;
 	}
 	# ----------------------------------------------
-	public function getRequestMethod(){
+	public function getRequestMethod() {
 		return $this->ops_request_method;
 	}
 	# ----------------------------------------------
-	public function setRequestBody($pa_request_body){
+	public function setRequestBody($pa_request_body) {
 		$this->opa_request_body = $pa_request_body;
 	}
 	# ----------------------------------------------
-	public function getRequestBody(){
+	public function getRequestBody() {
 		return $this->opa_request_body;
 	}
 	# ----------------------------------------------
-	public function setTable($ps_table){
+	public function setTable($ps_table) {
 		$this->ops_table = $ps_table;
 	}
 	# ----------------------------------------------
-	public function getTable(){
+	public function getTable() {
 		return $this->ops_table;
 	}
 	# ----------------------------------------------
-	public function addGetParameter($ps_param_name,$ps_value){
+	public function addGetParameter($ps_param_name,$ps_value) {
 		$this->opa_get_parameters[$ps_param_name] = $ps_value;
 	}
 	# ----------------------------------------------
-	public function getAllGetParameters(){
+	public function getAllGetParameters() {
 		return $this->opa_get_parameters;
 	}
 	# ----------------------------------------------
-	public function getGetParameter($ps_param_name){
+	public function getGetParameter($ps_param_name) {
 		return $this->opa_get_parameters[$ps_param_name];
 	}
 	# ----------------------------------------------
@@ -69,25 +69,25 @@ abstract class BaseServiceClient {
 		return $this->ops_lang;
 	}
 	# ----------------------------------------------
-	public function request(){
-		if(!($vs_method = $this->getRequestMethod())){
+	public function request() {
+		if(!($vs_method = $this->getRequestMethod())) {
 			return false;
 		}
 
 		$va_get = array();
-		foreach($this->getAllGetParameters() as $vs_name => $vs_val){
+		foreach($this->getAllGetParameters() as $vs_name => $vs_val) {
 			$va_get[] = $vs_name."=".urlencode($vs_val);
 		}
 
 		$vs_get = sizeof($va_get)>0 ? "?".join("&",$va_get) : "";
 
-		$vo_handle = curl_init($this->ops_service_url."/".$this->getTable()."/".$vs_get);
+		$vo_handle = curl_init($vs_fuck = $this->ops_service_url."/".$this->getTable()."/".$vs_get);
 
 		curl_setopt($vo_handle, CURLOPT_CUSTOMREQUEST, $vs_method);
 		curl_setopt($vo_handle, CURLOPT_RETURNTRANSFER, true);
 
 		$va_body = $this->getRequestBody();
-		if(is_array($va_body) && sizeof($va_body)>0){
+		if(is_array($va_body) && sizeof($va_body)>0) {
 			curl_setopt($vo_handle, CURLOPT_POSTFIELDS, json_encode($va_body));
 		}
 
