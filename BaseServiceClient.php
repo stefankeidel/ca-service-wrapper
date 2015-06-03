@@ -4,21 +4,33 @@ require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'ServiceResult.php');
 
 abstract class BaseServiceClient {
 	# ----------------------------------------------
-	private $opa_get_parameters;
-	private $opa_request_body;
-	private $ops_request_method;
-	private $ops_service_url;
-	private $ops_table;
+	private $opa_get_parameters = array();
+	private $opa_request_body = array();
+	private $ops_request_method = '';
+	private $ops_service_url = '';
+	private $ops_table = '';
+	# ----------------------------------------------
+	private $ops_auth_url = '';
+	private $ops_auth_token = '';
+	private $ops_user = null;
+	private $ops_key = null;
 	# ----------------------------------------------
 	private $ops_lang = null;
 	# ----------------------------------------------
 	public function __construct($ps_base_url, $ps_service) {
 		$this->ops_service_url = $ps_base_url."/service.php/".$ps_service;
+		$this->ops_auth_url = $ps_base_url."/service.php/auth/login";
 
-		$this->opa_get_parameters = array();
-		$this->opa_request_body = array();
-		$this->ops_request_method = "";
-		$this->ops_table = "";
+		// try to get user and password/key from environment
+		if(defined('__CA_SERVICE_API_USER__') && defined('__CA_SERVICE_API_KEY__')) {
+			$this->ops_user = __CA_SERVICE_API_USER__;
+			$this->ops_key = __CA_SERVICE_API_KEY__;
+		}
+
+		if(!$this->ops_user || !$this->ops_key) {
+			$this->ops_user = getenv('CA_SERVICE_API_USER');
+			$this->ops_key = getenv('CA_SERVICE_API_KEY');
+		}
 	}
 	# ----------------------------------------------
 	public function setRequestMethod($ps_method) {
@@ -69,6 +81,11 @@ abstract class BaseServiceClient {
 		return $this->ops_lang;
 	}
 	# ----------------------------------------------
+	public function setCredentials($ps_user, $ps_pass) {
+		$this->ops_user = $ps_user;
+		$this->ops_key = $ps_pass;
+	}
+	# ----------------------------------------------
 	public function request() {
 		if(!($vs_method = $this->getRequestMethod())) {
 			return false;
@@ -79,12 +96,17 @@ abstract class BaseServiceClient {
 			$va_get[] = $vs_name."=".urlencode($vs_val);
 		}
 
+		if(strlen($this->ops_auth_token) > 0) {
+			$va_get[] = 'authToken='.$this->ops_auth_token;
+		}
+
 		$vs_get = sizeof($va_get)>0 ? "?".join("&",$va_get) : "";
 
 		$vo_handle = curl_init($this->ops_service_url."/".$this->getTable()."/".$vs_get);
 
 		curl_setopt($vo_handle, CURLOPT_CUSTOMREQUEST, $vs_method);
 		curl_setopt($vo_handle, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($vo_handle, CURLOPT_TIMEOUT, 3);
 
 		$va_body = $this->getRequestBody();
 		if(is_array($va_body) && sizeof($va_body)>0) {
@@ -92,10 +114,43 @@ abstract class BaseServiceClient {
 		}
 
 		$vs_exec = curl_exec($vo_handle);
+		$vn_code = curl_getinfo($vo_handle, CURLINFO_HTTP_CODE);
+
+		if($vn_code == 401) { // re-authenticate if access denied
+			if(!$this->authenticate()) { // make up json result for failed authentication
+				return new ServiceResult('{ "ok": false, "errors": ["access denied"] }');
+			} else { // auth successful, try again
+				return $this->request();
+			}
+		}
+
 		curl_close($vo_handle);
 
 		return new ServiceResult($vs_exec);
 	}
 	# ----------------------------------------------
-}
+	protected function authenticate() {
 
+		$vo_handle = curl_init($this->ops_auth_url);
+
+		curl_setopt($vo_handle, CURLOPT_CUSTOMREQUEST, 'GET');
+		curl_setopt($vo_handle, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($vo_handle, CURLOPT_TIMEOUT, 3);
+		curl_setopt($vo_handle, CURLOPT_RETURNTRANSFER,1);
+
+		// basic auth
+		curl_setopt($vo_handle, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+		curl_setopt($vo_handle, CURLOPT_USERPWD, $this->ops_user.':'.$this->ops_key);
+
+		$vs_exec = curl_exec($vo_handle);
+		curl_close($vo_handle);
+
+		$va_ret = json_decode($vs_exec, true);
+
+		if(!is_array($va_ret) || !isset($va_ret['authToken']) || (strlen($va_ret['authToken']) != 64)) { return false; }
+		$this->ops_auth_token = $va_ret['authToken'];
+
+		return true;
+	}
+	# ----------------------------------------------
+}
