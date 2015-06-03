@@ -41,3 +41,45 @@ $vo_result = $vo_client->request();
 
 $vo_result->isOk() ? print_r($vo_result->getRawData()) : print_r($vo_result->getErrors());
 ```
+
+To use authentication, you'd either use the PHP constants `__CA_SERVICE_API_USER__` and `__CA_SERVICE_API_KEY__` as follows,
+which comes in handy if you want to run multiple service requests in the same script. 
+
+```php
+require './ca-service-wrapper/ItemService.php';
+
+define('__CA_SERVICE_API_USER__', 'administrator');
+define('__CA_SERVICE_API_KEY__', 'dublincore');
+
+$o_service = new ItemService('http://localhost', 'ca_objects', 'GET', 1);
+$o_result = $o_service->request();
+```
+
+You can also use the setter:
+
+```php
+require './ca-service-wrapper/ItemService.php';
+
+$o_service = new ItemService('http://providence.dev', 'ca_objects', 'GET', 1);
+$o_service->setCredentials('administrator', 'dublincore');
+$o_result = $o_service->request();
+```
+
+The 3rd option (and probably most suitable for production) is to pass the credentials as environment variables `CA_SERVICE_API_USER` and `CA_SERVICE_API_KEY`.
+Imagine this simple script as `authtest.php`
+
+```php
+require './ca-service-wrapper/ItemService.php';
+
+$o_service = new ItemService('http://localhost', 'ca_objects', 'GET', 1);
+$o_result = $o_service->request();
+```
+
+Then something like this should work:
+
+```bash
+export CA_SERVICE_API_USER=administrator; export CA_SERVICE_API_KEY=dublincore
+php authtest.php
+```
+
+To do this in a web server setting, you could look into [apache's mod-env](http://httpd.apache.org/docs/2.4/mod/mod_env.html).
