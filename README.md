@@ -42,8 +42,16 @@ $vo_result = $vo_client->request();
 $vo_result->isOk() ? print_r($vo_result->getRawData()) : print_r($vo_result->getErrors());
 ```
 
-To use authentication, you'd either use the PHP constants `__CA_SERVICE_API_USER__` and `__CA_SERVICE_API_KEY__` as follows,
-which comes in handy if you want to run multiple service requests in the same script. 
+To use authentication, you basically have 3 options. The first is to use the PHP constants 
+`__CA_SERVICE_API_USER__` and `__CA_SERVICE_API_KEY__` as shown in the next example,
+This comes in handy if you want to run multiple service requests in the same script.
+ 
+Note that all 3 authentication options try to retrieve an authToken from the remote service,
+save it in a temporary directory and re-use it as long as it's valid. When it expires, it
+re-authenticates using the username and key provided using one of the 3 options below. user/key
+are not used in the mean time.
+
+Now back to option one - the constants:
 
 ```php
 require './ca-service-wrapper/ItemService.php';
@@ -55,7 +63,7 @@ $o_service = new ItemService('http://localhost', 'ca_objects', 'GET', 1);
 $o_result = $o_service->request();
 ```
 
-You can also use the setter:
+You can also use a simple setter:
 
 ```php
 require './ca-service-wrapper/ItemService.php';
@@ -65,8 +73,8 @@ $o_service->setCredentials('administrator', 'dublincore');
 $o_result = $o_service->request();
 ```
 
-The 3rd option (and probably most suitable for production) is to pass the credentials as environment variables `CA_SERVICE_API_USER` and `CA_SERVICE_API_KEY`.
-Imagine this simple script as `authtest.php`
+The 3rd option (and probably most suitable for production) is to pass the credentials as environment variables
+`CA_SERVICE_API_USER` and `CA_SERVICE_API_KEY`. Imagine this simple script as `authtest.php`
 
 ```php
 require './ca-service-wrapper/ItemService.php';
@@ -75,10 +83,11 @@ $o_service = new ItemService('http://localhost', 'ca_objects', 'GET', 1);
 $o_result = $o_service->request();
 ```
 
-Then something like this should work:
+Then running something like this in a terminal should work:
 
 ```bash
-export CA_SERVICE_API_USER=administrator; export CA_SERVICE_API_KEY=dublincore
+export CA_SERVICE_API_USER=administrator
+export CA_SERVICE_API_KEY=dublincore
 php authtest.php
 ```
 
