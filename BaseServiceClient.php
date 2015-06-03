@@ -14,6 +14,7 @@ abstract class BaseServiceClient {
 	private $ops_auth_token = '';
 	private $ops_user = null;
 	private $ops_key = null;
+	private $ops_token_storage_path = '';
 	# ----------------------------------------------
 	private $ops_lang = null;
 	# ----------------------------------------------
@@ -30,6 +31,16 @@ abstract class BaseServiceClient {
 		if(!$this->ops_user || !$this->ops_key) {
 			$this->ops_user = getenv('CA_SERVICE_API_USER');
 			$this->ops_key = getenv('CA_SERVICE_API_KEY');
+		}
+
+		// this is where we store the token for later reuse
+		$this->ops_token_storage_path =
+			sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'ca-service-wrapper-token'.preg_replace("/[^A-Za-z0-9\-\_]/", '', $ps_base_url).'.txt';
+
+		// try to recover token from file
+		$vs_potential_token = @file_get_contents($this->ops_token_storage_path);
+		if($vs_potential_token && (strlen($vs_potential_token) == 64) && preg_match("/^[a-f0-9]+$/", $vs_potential_token)) {
+			$this->ops_auth_token = $vs_potential_token;
 		}
 	}
 	# ----------------------------------------------
@@ -150,7 +161,14 @@ abstract class BaseServiceClient {
 		if(!is_array($va_ret) || !isset($va_ret['authToken']) || (strlen($va_ret['authToken']) != 64)) { return false; }
 		$this->ops_auth_token = $va_ret['authToken'];
 
+		// dump token into a file so we can find it later
+		@file_put_contents($this->ops_token_storage_path, $this->ops_auth_token);
+
 		return true;
+	}
+	# ----------------------------------------------
+	public function getAuthToken() {
+		return $this->ops_auth_token;
 	}
 	# ----------------------------------------------
 }
