@@ -126,16 +126,20 @@ abstract class BaseServiceClient {
 
 		$vs_exec = curl_exec($vo_handle);
 		$vn_code = curl_getinfo($vo_handle, CURLINFO_HTTP_CODE);
+		curl_close($vo_handle);
 
-		if($vn_code == 401) { // re-authenticate if access denied
+		if($vn_code == 401) { // try to re-authenticate if access denied
+			// discard previous token
+			if(strlen($this->ops_auth_token)) {
+				@file_put_contents($this->ops_token_storage_path, '');
+			}
+
 			if(!$this->authenticate()) { // make up json result for failed authentication
 				return new ServiceResult('{ "ok": false, "errors": ["access denied"] }');
 			} else { // auth successful, try again
 				return $this->request();
 			}
 		}
-
-		curl_close($vo_handle);
 
 		return new ServiceResult($vs_exec);
 	}
