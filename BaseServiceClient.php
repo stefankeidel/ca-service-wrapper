@@ -117,7 +117,6 @@ abstract class BaseServiceClient {
 
 		curl_setopt($vo_handle, CURLOPT_CUSTOMREQUEST, $vs_method);
 		curl_setopt($vo_handle, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($vo_handle, CURLOPT_TIMEOUT, 3);
 
 		$va_body = $this->getRequestBody();
 		if(is_array($va_body) && sizeof($va_body)>0) {
