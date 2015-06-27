@@ -113,7 +113,8 @@ abstract class BaseServiceClient {
 
 		$vs_get = sizeof($va_get)>0 ? "?".join("&",$va_get) : "";
 
-		$vo_handle = curl_init($this->ops_service_url."/".$this->getTable()."/".$vs_get);
+		$vs_query_url = preg_replace("/\/$/", '', $this->ops_service_url."/".$this->getTable().$vs_get);
+		$vo_handle = curl_init($vs_query_url);
 
 		curl_setopt($vo_handle, CURLOPT_CUSTOMREQUEST, $vs_method);
 		curl_setopt($vo_handle, CURLOPT_RETURNTRANSFER, true);
