@@ -118,6 +118,8 @@ abstract class BaseServiceClient {
 
 		curl_setopt($vo_handle, CURLOPT_CUSTOMREQUEST, $vs_method);
 		curl_setopt($vo_handle, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($vo_handle, CURLOPT_SSL_VERIFYHOST, 0);
+		curl_setopt($vo_handle, CURLOPT_SSL_VERIFYPEER, 0);
 
 		$va_body = $this->getRequestBody();
 		if(is_array($va_body) && sizeof($va_body)>0) {
@@ -152,6 +154,8 @@ abstract class BaseServiceClient {
 		curl_setopt($vo_handle, CURLOPT_RETURNTRANSFER, true);
 		curl_setopt($vo_handle, CURLOPT_TIMEOUT, 3);
 		curl_setopt($vo_handle, CURLOPT_RETURNTRANSFER,1);
+		curl_setopt($vo_handle, CURLOPT_SSL_VERIFYHOST, 0);
+		curl_setopt($vo_handle, CURLOPT_SSL_VERIFYPEER, 0);
 
 		// basic auth
 		curl_setopt($vo_handle, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
