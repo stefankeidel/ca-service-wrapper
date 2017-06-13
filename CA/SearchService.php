@@ -1,11 +1,11 @@
 <?php
 
-require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'BaseServiceClient.php');
+namespace CA;
 
-class AlhalqaSearchService extends BaseServiceClient {
+class SearchService extends BaseServiceClient {
 	# ----------------------------------------------
 	public function __construct($ps_base_url,$ps_table,$ps_query){
-		parent::__construct($ps_base_url,"alhalqaServices/AlhalqaFind");
+		parent::__construct($ps_base_url,"find");
 
 		$this->setRequestMethod("GET");
 		$this->setTable($ps_table);
