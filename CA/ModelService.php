@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'BaseServiceClient.php');
+namespace CA;
 
 class ModelService extends BaseServiceClient {
 	# ----------------------------------------------
