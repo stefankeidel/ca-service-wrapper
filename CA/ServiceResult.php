@@ -1,5 +1,7 @@
 <?php
 
+namespace CA;
+
 class ServiceResult {
 	# ----------------------------------------------
 	private $opa_data;

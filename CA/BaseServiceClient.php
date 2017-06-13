@@ -1,6 +1,6 @@
 <?php
 
-require_once(dirname(__FILE__).DIRECTORY_SEPARATOR.'ServiceResult.php');
+namespace CA;
 
 abstract class BaseServiceClient {
 	# ----------------------------------------------
