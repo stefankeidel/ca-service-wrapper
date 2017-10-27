@@ -121,7 +121,7 @@ abstract class BaseServiceClient {
 		curl_setopt($vo_handle, CURLOPT_SSL_VERIFYHOST, 0);
 		curl_setopt($vo_handle, CURLOPT_SSL_VERIFYPEER, 0);
 		curl_setopt($vo_handle, CURLOPT_FOLLOWLOCATION, true);
-		curl_setopt($vo_handle, CURLOPT_CONNECTTIMEOUT, 0);
+		curl_setopt($vo_handle, CURLOPT_CONNECTTIMEOUT, 60);
 		curl_setopt($vo_handle, CURLOPT_TIMEOUT, 600);
 
 		$va_body = $this->getRequestBody();
@@ -155,11 +155,12 @@ abstract class BaseServiceClient {
 
 		curl_setopt($vo_handle, CURLOPT_CUSTOMREQUEST, 'GET');
 		curl_setopt($vo_handle, CURLOPT_RETURNTRANSFER, true);
-		curl_setopt($vo_handle, CURLOPT_TIMEOUT, 3);
 		curl_setopt($vo_handle, CURLOPT_RETURNTRANSFER,1);
 		curl_setopt($vo_handle, CURLOPT_SSL_VERIFYHOST, 0);
 		curl_setopt($vo_handle, CURLOPT_SSL_VERIFYPEER, 0);
 		curl_setopt($vo_handle, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($vo_handle, CURLOPT_CONNECTTIMEOUT, 60);
+		curl_setopt($vo_handle, CURLOPT_TIMEOUT, 600);
 
 		// basic auth
 		curl_setopt($vo_handle, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
