@@ -19,8 +19,8 @@ abstract class BaseServiceClient {
 	private $ops_lang = null;
 	# ----------------------------------------------
 	public function __construct($ps_base_url, $ps_service) {
-		$this->ops_service_url = $ps_base_url."/service.php/".$ps_service;
-		$this->ops_auth_url = $ps_base_url."/service.php/auth/login";
+		$this->ops_service_url = $ps_base_url."/service.php/json/".$ps_service;
+		$this->ops_auth_url = $ps_base_url."/service.php/json/auth/login";
 
 		// try to get user and password/key from environment
 		if(defined('__CA_SERVICE_API_USER__') && defined('__CA_SERVICE_API_KEY__')) {
